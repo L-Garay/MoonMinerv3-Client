@@ -5,12 +5,15 @@ import App from './App';
 import { BrowserRouter as Router } from 'react-router-dom';
 import Auth0ProviderWithHistory from './auth/auth0-provider-with-history';
 import reportWebVitals from './reportWebVitals';
+import ApolloContext from './contexts/Apollo/index';
 
 ReactDOM.render(
   <React.StrictMode>
     <Router>
       <Auth0ProviderWithHistory>
-        <App />
+        <ApolloContext>
+          <App />
+        </ApolloContext>
       </Auth0ProviderWithHistory>
     </Router>
   </React.StrictMode>,
