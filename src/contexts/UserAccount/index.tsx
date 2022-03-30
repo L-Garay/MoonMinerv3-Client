@@ -49,6 +49,22 @@ const CREATE_USERACCOUNT = gql`
   }
 `;
 
+// Define Subscription
+const GAME_SUBSCRIPTION = gql`
+  subscription NewGameCreated($id: Int!) {
+    gameCreated(id: $id) {
+      id
+      name
+      email
+      games {
+        id
+        name
+        userAccountId
+      }
+    }
+  }
+`;
+
 const UserAccountContext = React.createContext<UserAccountData>(
   {} as UserAccountData
 );
@@ -65,7 +81,7 @@ export function UserAccountProvider(props: { children: React.ReactNode }) {
   const auth0Account = React.useMemo(() => user, [user]);
   const [
     getUserAccount,
-    { loading: getLoading, error: getError, data: getData },
+    { loading: getLoading, error: getError, data: getData, subscribeToMore },
   ] = useLazyQuery(USERACCOUNT, { variables: { email: auth0Account?.email } });
   const [
     createUserAccount,
@@ -78,6 +94,7 @@ export function UserAccountProvider(props: { children: React.ReactNode }) {
     if (auth0Account) {
       const asyncAccount = async () => {
         const account = await getUserAccount();
+
         // Only set state if there is actual data, otherwise leave it null
         if (
           account.data &&
@@ -105,6 +122,34 @@ export function UserAccountProvider(props: { children: React.ReactNode }) {
       asyncCreateAccount();
     }
   }, [auth0Account, userAccount, createUserAccount, hasFetchedAccount]);
+
+  React.useEffect(() => {
+    const subscribe = () => {
+      // NOTE keep getting an error in the console about missing field when trying to write result to cache
+      // occurs after adding a game, everything seems to be working fine otherwise
+      // TODO try to investigate why it is trying to update the game cache
+      subscribeToMore({
+        document: GAME_SUBSCRIPTION,
+        variables: { id: userAccount?.id },
+        updateQuery: (prev, { subscriptionData }) => {
+          // NOTE interestingly, both prev and subscirptionData have the same data
+          // both have the same (updated) number of games...
+          console.log('previous state', prev);
+          if (!subscriptionData.data) return prev;
+          console.log('subscriptionData', subscriptionData);
+          const newUser = subscriptionData.data.gameCreated;
+          console.log('new user', newUser);
+          setUserAccount(newUser);
+          return Object.assign({}, prev, newUser);
+        },
+      });
+    };
+    if (userAccount) {
+      subscribe();
+    }
+  }, [userAccount, subscribeToMore]);
+
+  console.log(userAccount, 'from context');
 
   let errorMessages: string[] = [];
   if (getError) errorMessages.push(getError.message);

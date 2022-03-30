@@ -3,20 +3,6 @@ import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import Loading from './dataFetching/Loading';
 import { useUserAccount } from '../contexts/UserAccount';
 
-// Define Query
-// const BOOKS = gql`
-//   query GetBooks {
-//     books {
-//       title
-//       content
-//       published
-//       author {
-//         name
-//       }
-//     }
-//   }
-// `;
-
 // Define mutation
 // I don't believe we'll need to get anything back specifically
 // Want to setup subscriber to watch userAccount, which should hold newly created game
@@ -65,19 +51,6 @@ const Books = () => {
                 <p>Last played: {game.updatedAt}</p>
               </div>
             ))}
-          {/* <button className="btn btn-info" onClick={() => getBooks()}>
-        Get Books
-      </button> */}
-          {/* {loading && <h3>Loading...</h3>} */}
-          {/* {bookData &&
-            bookData.books.map((book) => {
-              return (
-                <div key={book.title} className="mb-4">
-                  <p>Title: {book.title}</p>
-                  <p>Author: {book.author.name}</p>
-                </div>
-              );
-            })} */}
         </div>
         <div>
           <form action="#" onSubmit={handleSubmit}>
