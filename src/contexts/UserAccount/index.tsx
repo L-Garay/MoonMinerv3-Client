@@ -21,8 +21,9 @@ interface UserAccountData {
 const USERACCOUNT = gql`
   query GetUserAccount($email: String) {
     userAccount(email: $email) {
-      name
       email
+      name
+      id
       games {
         id
         updatedAt
@@ -58,6 +59,7 @@ export function UserAccountProvider(props: { children: React.ReactNode }) {
   const [hasFetchedAccount, setHasFetchedAccount] =
     React.useState<boolean>(false);
   // NOTE there are three different possible loading, error and data sources
+  // one source is auth0, second source is getUserAccount query, third source is createUserAccount mutation
   // TODO need to iron out the logic of when to show each possible outcome and how
   const { isLoading, error, user, isAuthenticated } = useAuth0();
   const auth0Account = React.useMemo(() => user, [user]);

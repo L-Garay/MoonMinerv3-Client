@@ -13,19 +13,22 @@ import { UserAccountProvider } from './contexts/UserAccount';
 
 import ProtectedRoute from './auth/ProtectedRoute';
 import NavigationBar from './components/navigation/NavigationBar';
-// import Loading from './components/dataFetching/Loading';
+import Loading from './components/dataFetching/Loading';
 import Authenticating from './components/dataFetching/Authenticating';
 import AuthenticationButton from './components/accounts/AuthenticationButtons';
 import SignupButton from './components/accounts/SignupButton';
 import Books from './components/Books';
 
 const MainContent = () => {
-  const { user, loginWithRedirect } = useAuth0();
+  const { user, loginWithRedirect, isLoading } = useAuth0();
 
   const routeMatches = useMatch('/home');
 
-  if (!user && routeMatches) {
+  if (!user && routeMatches && !isLoading) {
     return <Authenticating />;
+  }
+  if (!user && routeMatches && isLoading) {
+    return <Loading />;
   }
   return (
     <React.Fragment>
